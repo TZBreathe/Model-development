@@ -280,7 +280,7 @@ for i_c = 1:length(cycleIter)
 				lastResults = xOpt{i_f-1,i_c};
 				% Because there is no guess for k(4:5), guess that k0(4) =
 				% k(2) and k0(5) = k(3). (k(1:5) = R_0, R_1, C_1, tauD, kD)
-				lastResults = [lastResults; 5000; 1.2];
+				lastResults = [lastResults; 3000; 1.2];
 				
 				k0 = lastResults;
 				% Use bounds based on constrainfactors for first 3 entries,

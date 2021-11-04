@@ -2,7 +2,7 @@
  % 
  % -SYNOPSIS
  % Test different ECN models by fitting to a single param run. DCIR data
- % already segmented. DCIR File No. 13 or 14.
+ % already segmented. DCIR File No. 11 or 12.
  %
  
 
@@ -41,7 +41,7 @@ EcnSettings.fitSlowRelax = false; %true: Fit relaxation of slow pulse. false: do
 % and the lower bound is:
 % initialGuess/constrainFac
 EcnSettings.constrainFacHfEstimates = [1 1.5 2.5 2]; % Factor by wich HF parameters are constrained for each fit iteration
-EcnSettings.constrainFacLfEstimates = [NaN NaN NaN 2.5]; % Factor by wich LF parameters are constrained for each fit iteration
+EcnSettings.constrainFacLfEstimates = [NaN NaN 2 2.5]; % Factor by wich LF parameters are constrained for each fit iteration
 
 % Expexted maximum value of objective function, if the true value is lower,
 % an iteration is repeated
@@ -51,7 +51,7 @@ EcnSettings.initPopSpread = [0 2 2 2]; % Number governing the initial solution p
 EcnSettings.optiTimeMins = [1 3 5 6]; % Time in minutes for each GA optimisation iteration
 
 EcnSettings.paramLowerBounds = [0.001	2e-3	0.5		1e3      0.8]'; % R_0, R_1, tau_1, tauD, kD
-EcnSettings.paramUpperBounds = [0.05	0.1		20		1e4		3]';
+EcnSettings.paramUpperBounds = [0.05	0.3	     50		2e3		1.5]';
 
 % Breakpoints to use in the ECN LUT
 Ecn.Dims.soc = 0:0.05:1;
@@ -77,7 +77,7 @@ fittingCycles = [0];
 % Load Data from File_List
 
 fileTable = readtable('DCIR_File_List.xlsx');
-fileIterator = 12; % Choose the single param test at 25 deg 2C rate.
+fileIterator = 11; % Choose the single param test at 25 deg 2C rate.
 
 % load OCV data from ECN_Parameters (the other data, such as ECN, is not used)
 load('ECN_Parameters.mat','S48X')
