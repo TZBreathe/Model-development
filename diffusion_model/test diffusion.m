@@ -1,12 +1,14 @@
 %% Load experiment and OCV lookup 
 
+clear;
 load brOCV;
 load experiment;
+dataEnd=11000;
+dataBegin=1;
 
-currData=currentSeries(6950:7950,2);
-timeData=currentSeries(6950:7950,1)-currentSeries(6950,1);
-socData=socRefSeries(6950:7950,2);
-voltageData=voltageSeries(6950:7950,2);
+currData=currentSeries(6950:dataEnd,2);
+socData=socRefSeries(6950:dataEnd,2);
+voltageData=voltageSeries(6950:dataEnd,2);
 timeData=1:length(currData);
 ocvData=BrOcv;
 
@@ -15,9 +17,9 @@ ocvData=BrOcv;
 
 % Initial values and bounds
 
-k0=[0.01195 0.0095 4.38 1200 1.1]'; %R0, R1, tauRC, tauD, kd
-lowBound = [[k0(1:3)/3];k0(4)/1.5;k0(5)/3];
-upBound = [[k0(1:3)*3];k0(4)*1.5;k0(5)*1.5];
+k0=[0.01195; 100; 0.2; 1500; 0.8; 1.2]; %R0, I0, alpha, tauD, beta, kd
+lowBound = [k0(1)/2;  10;      0.05; 600;   0.5;   k0(6)/2];
+upBound = [k0(1)*2;   k0(2)*3; 1;    3000;  1.5;   k0(6)*2];
 
 iniPopSpread=2;
 initGaPopSize = 50;
@@ -44,16 +46,31 @@ genAlgOpts = optimoptions('ga','Display','iter','InitialPopulationMatrix',...
 
 %%
 params=xOptTmp;
-[Vsim,soc]=diffusion_model_run(params,currData,timeData,socData,ocvData);
+[Vsim,soc,Vdiff]=diffusion_model_run(params,currData,timeData,socData,ocvData);
 
-hold on
-plot(timeData,Vsim,'bl');
+hold on;
+plot(socData,Vsim,'bl');
+plot(socData,voltageData);
+hold off;
 
-plot(timeData,voltageData);
+plot(timeData,voltageData-Vsim);
 
 
+
+x=linspace(0,1,100);
+plot(x,params(4)./(x+params(5)));
+for timestep=1:length(currData)
+Vbv(timestep)=0.0256*2*asinh(currData(timestep)/(params(2)*(socData(timestep)+params(3))*(1-socData(timestep)+params(3))));
+end
+plot(timeData,Vbv);
+plot(socData,Vdiff);
+
+plot(socData,currData/100);
+
+
+hold on;
 plot(socData,socData); plot(socData,soc,'red');
-plot(timeData,currData/3)
+
 
 
 

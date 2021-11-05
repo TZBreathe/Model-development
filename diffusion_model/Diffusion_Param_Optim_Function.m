@@ -29,7 +29,7 @@ function [obj, voltModel] = Diffusion_Param_Optim_Function(k,currData,timeData,s
 % Calculate the voltage resopnse
 voltModel = diffusion_model(k,currData,timeData,socData,OcvLuts);
 
-obj = 1e6.*sum(sum((voltModel - voltData).^2))./length(timeData); 
+obj = 1e3.*sum(sum((voltModel - voltData).^2))./length(timeData); 
 % Factor of 1e6 results in higher numbers, which means the optimisation does not stop prematurely
 % Divide by length of timeData to normalise the objective value and compare
 % across different data sets
