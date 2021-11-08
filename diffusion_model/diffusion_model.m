@@ -11,7 +11,8 @@ I_0 = k(2);
 alpha=k(3);
 tau0=k(4);
 beta=k(5);
-kd=k(6);
+gama=k(6);
+kd=k(7);
 
 
 SoC0=socData(1);
@@ -48,7 +49,7 @@ curr_Data=currData;
 for timestep = 1:times
     
 IR0=R_0.*curr_Data(timestep);     
-Vbv=0.0256*2*asinh(currData(timestep)/(I_0*(socData(timestep)+alpha)*(1-socData(timestep)+alpha))); %BV-like overpotential, larger at high & low soc
+Vbv=0.0256*2*asinh(currData(timestep)/(I_0*((socData(timestep)+alpha)^1)*(1-socData(timestep)+alpha)^1)); %BV-like overpotential, larger at high & low soc
 
 M_hyst=interp1(OcvLuts.Dims.soc,hyst,socData(timestep));
 M0=interp1(OcvLuts.Dims.soc,hyst_0,socData(timestep));
@@ -56,7 +57,8 @@ h=exp(-dt*abs(curr_Data(timestep))*k_hyst/(Q))*h+sign(curr_Data(timestep))*(1-ex
 U_hyst=M_hyst.*h+sign(curr_Data(timestep)).*M0;
 % 
 
-tau=tau0/(socData(timestep)+beta); 
+% tau=tau0/(socData(timestep)+beta); %inverse form
+tau=gama*(socData(timestep)-beta)^2+tau0; %quadratic form
 % tau=1;%so that tau is higher at low SoC
 flux = -1/tau*diff(SoC)/dR; % flux at surfaces between "bins"
 M = flux.*Sa(1:end-1); % total SoC crossing surface between bins
