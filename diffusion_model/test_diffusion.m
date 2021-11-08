@@ -56,6 +56,7 @@ hold off;
 
 figure();
 plot(timeData,Vsim-voltageData);
+error_fit=sum(abs(Vsim-voltageData));
 
 x=linspace(0,1,100);
 
@@ -90,15 +91,22 @@ timeData=1:length(currData);
 
 params=xOptTmp;
 [Vsim,soc,Vdiff]=diffusion_model_run(params,currData,timeData,socData,ocvData);
+error_val=sum(abs(Vsim-voltageData));
+
+
 
 figure();
 hold on;
 plot(socData,Vsim,'bl');
 plot(socData,voltageData);
+xlabel('SoC');
+ylabel('Voltage');
+
+yyaxis right
+plot(socData,currData,'red');
+ylabel('Current','color','red');
+legend('Model','Exp','Current','location','southeast');
 hold off;
-
-
-
 
 
 
