@@ -50,8 +50,8 @@ EcnSettings.fThreshold = [0 70 70 50];
 EcnSettings.initPopSpread = [0 2 2 2]; % Number governing the initial solution population spread (higher = less spread, minimum = 1)
 EcnSettings.optiTimeMins = [1 3 5 6]; % Time in minutes for each GA optimisation iteration
 
-EcnSettings.paramLowerBounds = [0.001	2e-3	0.5		1e3      0.8]'; % R_0, R_1, tau_1, tauD, kD
-EcnSettings.paramUpperBounds = [0.05	0.3	     50		2e3		1.5]';
+EcnSettings.paramLowerBounds = [0.001	2e-3	1		1e3      0.8]'; % R_0, R_1, tau_1, tauD, kD
+EcnSettings.paramUpperBounds = [0.02	0.3	     100	5e3		1.8]';
 
 % Breakpoints to use in the ECN LUT
 Ecn.Dims.soc = 0:0.05:1;

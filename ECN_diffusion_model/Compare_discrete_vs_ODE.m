@@ -1,30 +1,37 @@
 %% Compare model vs experiment lincc charge
-% random data processing
-ECN.R0=Ecn.Components.R_0(:,1,1);
-ECN.R1=Ecn.Components.R_1(:,1,1);
-ECN.tau1=Ecn.Components.tau_1(:,1,1);
-ECN.tau=Ecn.Components.R_2(:,1,1);
-ECN.kd=Ecn.Components.tau_2(:,1,1);
-ECN.soc=Ecn.Dims.soc';
+%random data processing
+% ECN.R0=Ecn.Components.R_0(:,1,1);
+% ECN.R1=Ecn.Components.R_1(:,1,1);
+% ECN.tau1=Ecn.Components.tau_1(:,1,1);
+% ECN.tau=Ecn.Components.R_2(:,1,1);
+% ECN.kd=Ecn.Components.tau_2(:,1,1);
+% ECN.soc=Ecn.Dims.soc';
+% 
+% ECN.R0(end-3:end)=ECN.R0(end-4);
+% ECN.R1(end-3:end)=ECN.R1(end-4);
+% ECN.tau1(end-3:end)=ECN.tau1(end-4);
+% ECN.tau(end-3:end)=ECN.tau(end-4);
+% ECN.kd(end-3:end)=ECN.kd(end-4);
+%%
+load experiment
+load brOCV
+% load ECN
 
-ECN.R0(end-3:end)=ECN.R0(end-4);
-ECN.R1(end-3:end)=ECN.R1(end-4);
-ECN.tau1(end-3:end)=ECN.tau1(end-4);
-ECN.tau(end-3:end)=ECN.tau(end-4);
-ECN.kd(end-3:end)=ECN.kd(end-4);
+% currData=[zeros(1,600) 9*ones(1,1600) zeros(1,600)];
+% timeData=1:length(currData);
+% socData=zeros(1, length(currData));
+ocvData=BrOcv;
+currData=currentSeries(6800:11000,2);
+timeData=currentSeries(6800:11000,1)-currentSeries(6800,1);
+socData=socRefSeries(6800:11000,2);
+voltageData=voltageSeries(6800:11000,2);
 
-currData=[zeros(1,600) 9*ones(1,1600) zeros(1,600)];
-timeData=1:length(currData);
-socData=zeros(1, length(currData));
-ocvData.soc=BrOcv.Dims.soc';
-ocvData.ocv=BrOcv.Components.ocv(:,5)
-calcOnlyHf=0;
 
-[Vsim,soc]=diffusion_discrete_run(ECN,currData,timeData,socData,calcOnlyHf,ocvData);
+[Vsim,soc]=diffusion_discrete_run(ECN,currData,timeData,socData,ocvData);
 
 hold on
 plot(timeData,Vsim,'bl');
-plot(timeData,soc);
+plot(timeData,voltageData);
 %%
 %below is from SW testing
 currData=currentSeries(6800:11000,2);
