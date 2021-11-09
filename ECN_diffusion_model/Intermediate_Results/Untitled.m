@@ -1,22 +1,22 @@
-
-
-for i=1:5
-Ecn.Components.R_0(:,:,i)=Ecn.Components.R_0(:,:,4);   
-Ecn.Components.R_1(:,:,i)=Ecn.Components.R_1(:,:,4);
-Ecn.Components.R_2(:,:,i)=Ecn.Components.R_2(:,:,4); 
-Ecn.Components.tau_1(:,:,i)=Ecn.Components.tau_1(:,:,4);
-Ecn.Components.tau_2(:,:,i)=Ecn.Components.tau_2(:,:,4); 
-
-
-end
-
-for j=1:7
-   Ecn.Components.R_0(:,j,:)=Ecn.Components.R_0(:,4,:);   
-   Ecn.Components.R_1(:,j,:)=Ecn.Components.R_1(:,4,:);   
-   Ecn.Components.R_2(:,j,:)=Ecn.Components.R_2(:,4,:);   
-   Ecn.Components.tau_1(:,j,:)=Ecn.Components.tau_1(:,4,:);   
-   Ecn.Components.tau_2(:,j,:)=Ecn.Components.tau_2(:,4,:);   
- 
+% 
+% 
+% for i=1:5
+% Ecn.Components.R_0(:,:,i)=Ecn.Components.R_0(:,:,4);   
+% Ecn.Components.R_1(:,:,i)=Ecn.Components.R_1(:,:,4);
+% Ecn.Components.R_2(:,:,i)=Ecn.Components.R_2(:,:,4); 
+% Ecn.Components.tau_1(:,:,i)=Ecn.Components.tau_1(:,:,4);
+% Ecn.Components.tau_2(:,:,i)=Ecn.Components.tau_2(:,:,4); 
+% 
+% 
+% end
+% 
+% for j=1:7
+%    Ecn.Components.R_0(:,j,:)=Ecn.Components.R_0(:,4,:);   
+%    Ecn.Components.R_1(:,j,:)=Ecn.Components.R_1(:,4,:);   
+%    Ecn.Components.R_2(:,j,:)=Ecn.Components.R_2(:,4,:);   
+%    Ecn.Components.tau_1(:,j,:)=Ecn.Components.tau_1(:,4,:);   
+%    Ecn.Components.tau_2(:,j,:)=Ecn.Components.tau_2(:,4,:);   
+%  
    
 end
 
@@ -25,3 +25,24 @@ end
 % Ecn.Components.tau_1(Ecn.Components.tau_1==0)=2;
 % Ecn.Components.R_2(Ecn.Components.R_2==0)=1000;
 % Ecn.Components.tau_2(Ecn.Components.tau_2==0)=1;
+
+
+for i=1:5
+BrEcn.Components.R_0(:,:,i)=BrEcn.Components.R_0(:,:,4);   
+BrEcn.Components.R_1(:,:,i)=BrEcn.Components.R_1(:,:,4);
+BrEcn.Components.R_2(:,:,i)=BrEcn.Components.R_2(:,:,4); 
+BrEcn.Components.tau_1(:,:,i)=BrEcn.Components.tau_1(:,:,4);
+BrEcn.Components.tau_2(:,:,i)=BrEcn.Components.tau_2(:,:,4); 
+
+
+end
+
+for j=1:7
+   BrEcn.Components.R_0(:,j,:)=BrEcn.Components.R_0(:,4,:);   
+   BrEcn.Components.R_1(:,j,:)=BrEcn.Components.R_1(:,4,:);   
+   BrEcn.Components.R_2(:,j,:)=BrEcn.Components.R_2(:,4,:);   
+   BrEcn.Components.tau_1(:,j,:)=BrEcn.Components.tau_1(:,4,:);   
+   BrEcn.Components.tau_2(:,j,:)=BrEcn.Components.tau_2(:,4,:);   
+ 
+   
+end

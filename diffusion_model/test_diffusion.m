@@ -17,9 +17,9 @@ ocvData=BrOcv;
 
 % Initial values and bounds
 
-k0=[0.01195; 100; 0.2; 1000; 0.75; 7000; 1.2]; %R0, I0, alpha, tauD, beta,gama, kd
-lowBound = [k0(1)/2;  1;       0.01;  800;     0.4;    1000;  k0(7)/2];
-upBound = [k0(1)*2;   300;     0.4;   2000;    0.8;   20000;  k0(7)*2];
+k0=[0.01195; 100; 0.01; 1000; 0.75; 7000; 1.2]; %R0, I0, alpha, tauD, beta,gama, kd
+lowBound = [k0(1)/2;  1;       0.01;   800;     0.5;    800;  k0(7)/2];
+upBound = [k0(1)*2;   300;     0.2;   2000;    0.8;  15000;  k0(7)*2];
 
 iniPopSpread=2;
 initGaPopSize = 50;
@@ -43,21 +43,41 @@ genAlgOpts = optimoptions('ga','Display','iter','InitialPopulationMatrix',...
 % Perform the optimisation with the bounds
 [xOptTmp,fOpt(1,1),~,~] = ga(globObj,length(k0),[],[],[],[],lowBound,upBound,[],genAlgOpts);
 
+save Opt_params.mat xOptTmp
 
 %% Run and plot
 params=xOptTmp;
+dataEnd2=11000;
+dataBegin=1;
+
+currData=currentSeries(6950:dataEnd2,2);
+socData=socRefSeries(6950:dataEnd2,2);
+voltageData=voltageSeries(6950:dataEnd2,2);
+timeData=1:length(currData);
+
 [Vsim,soc,Vdiff]=diffusion_model_run(params,currData,timeData,socData,ocvData);
 
 figure();
 hold on;
 plot(socData,Vsim,'bl');
 plot(socData,voltageData);
+xlabel('SoC');
+ylabel('Voltage');
+
+yyaxis right
+plot(socData,currData,'red');
+ylabel('Current','color','red');
+legend('Model','Exp','Current','location','southeast');
 hold off;
 
-figure();
-plot(timeData,Vsim-voltageData);
-error_fit=sum(abs(Vsim-voltageData));
 
+figure();
+hold on;
+plot(timeData,Vsim-voltageData);
+xlabel('Time');
+ylabel('Voltage error');
+hold off;
+error_fit=rms(Vsim-voltageData);
 x=linspace(0,1,100);
 
 figure();
@@ -81,17 +101,16 @@ hold off;
 
 load experiment_validation;
 load Opt_params
-dataEnd=11000;
-dataBegin=1;
 
-currData=currentSeries(6950:dataEnd,2);
-socData=socRefSeries(6950:dataEnd,2);
-voltageData=voltageSeries(6950:dataEnd,2);
+
+currData=currentSeries(6950:dataEnd2,2);
+socData=socRefSeries(6950:dataEnd2,2);
+voltageData=voltageSeries(6950:dataEnd2,2);
 timeData=1:length(currData);
 
 params=xOptTmp;
-[Vsim,soc,Vdiff]=diffusion_model_run(params,currData,timeData,socData,ocvData);
-error_val=sum(abs(Vsim-voltageData));
+[Vsim,socr]=diffusion_model_run(params,currData,timeData,socData,ocvData);
+error_val=mean(abs(Vsim-voltageData));
 
 
 
@@ -108,5 +127,12 @@ ylabel('Current','color','red');
 legend('Model','Exp','Current','location','southeast');
 hold off;
 
-
-
+r=linspace(0,1,20);
+hold on;
+for i=1:200:1000
+    plot(r,socr(i,:));
+end
+xlabel('r');
+ylabel('SOC');
+legend('1s', '200s','400s','600s','8000s');
+hold off;

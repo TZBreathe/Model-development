@@ -1,6 +1,6 @@
 %% A simple diffusion+ECN model
 
-function [voltOut soc Vdiff]=diffusion_model_run(k,currData,timeData,socData,OcvLuts)
+function [voltOut SoCr]=diffusion_model_run(k,currData,timeData,socData,OcvLuts)
 %params
 
 N=1; % controls timestep
@@ -34,7 +34,7 @@ h(1)=-1;
 k_hyst=10;
 hyst=OcvLuts.Components.hystAmp(:,5); %Hyst data parameters, fifth column for 25 deg.
 hyst_0=OcvLuts.Components.hystInst(:,5);
-% SoCr=ones(length(timeData),Nr); %internal SoC, maybe useful for gradient]
+SoCr=ones(length(timeData),Nr); %internal SoC, maybe useful for gradient]
 
 %if using finer timestep 'interploate' input current array to larger size
 times=N*length(timeData);
@@ -61,6 +61,7 @@ tau=gama*(socData(timestep)-beta)^2+tau0; %quadratic form
 flux = -1/tau*diff(SoC)/dR; % flux at surfaces between "bins"
 M = flux.*Sa(1:end-1); % total SoC crossing surface between bins
 SoC= SoC+ ([0 M] - [M 0])*dt./dV; % conc. change via diffusion
+SoCr(timestep,:)=SoC;
 SoC(end) = SoC(end) + (curr_Data(timestep)/3/Q)*Sa(end)*dt/dV(end); % at boundary
 SoCs(timestep) = min(1,SoC(end)); % surface soc
 % SoCavg(timestep)=(SoC*dV')/(4/3*pi*R^3); % average soc
@@ -71,7 +72,7 @@ Vdiff(timestep)=-(kd*(OCVcell(timestep)-OCVcell_surf(timestep)));
 v_Out(timestep)=IR0+Vbv+Vdiff(timestep)+OCVcell(timestep)+U_hyst;
 % v_Out(timestep)=U_hyst;
 
-soc(timestep)=SoCs(timestep);
+% soc(timestep)=SoCs(timestep);
 end
 
 voltOut=v_Out';
