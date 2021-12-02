@@ -59,7 +59,7 @@ U_hyst=M_hyst.*h+sign(curr_Data(timestep)).*M0;
 
 % tau=tau0/(socData(timestep)+beta); %inverse form
 tau=gama*(socData(timestep)-beta)^2+tau0; %quadratic form
-% tau=1;%so that tau is higher at low SoC
+
 flux = -1/tau*diff(SoC)/dR; % flux at surfaces between "bins"
 M = flux.*Sa(1:end-1); % total SoC crossing surface between bins
 SoC= SoC+ ([0 M] - [M 0])*dt./dV; % conc. change via diffusion
