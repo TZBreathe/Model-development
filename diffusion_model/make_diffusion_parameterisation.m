@@ -4,11 +4,12 @@ clear;
 load brOCV;
 load lincc_25;
 
-% lets use Elbrus 15A -10 mV as training
-currData=lincc_25{5}(:,1);
-socData=lincc_25{5}(:,3);
-voltageData=lincc_25{5}(:,2);
-timeData=1:length(currData);
+% lets use Elbrus 15A 0 mV as training
+currData=lincc_25{5}(2:1400,1);
+socData=lincc_25{5}(2:1400,3);
+voltageData=lincc_25{5}(2:1400,2);
+
+timeData=1:length(currData)';
 ocvData=BrOcv;
 
 
@@ -47,7 +48,7 @@ save Opt_params.mat xOptTmp
 %% Run and plot
 params=xOptTmp;
 
-[Vsim,soc,Vdiff]=diffusion_model_run(params,currData,timeData,socData,ocvData);
+[Vsim,soc]=diffusion_model_run(params,currData,timeData,socData,ocvData);
 
 figure();
 hold on;
@@ -92,36 +93,36 @@ hold off;
 %% Test run
 % let's test with Elbrus 20A -20mv
 
-currData_t=lincc_25{10}(:,1);
-socData_t=socRefSeries(6950:dataEnd2,2);
-voltageData_t=voltageSeries(6950:dataEnd2,2);
-timeData=1:length(currData);
+currData_t=lincc_25{7}(2:1400,1);
+socData_t=lincc_25{7}(2:1400,3);
+voltageData_t=lincc_25{7}(2:1400,2);
+timeData=1:length(currData_t)';
 
 params=xOptTmp;
-[Vsim,socr]=diffusion_model_run(params,currData,timeData,socData,ocvData);
-error_val=mean(abs(Vsim-voltageData));
+[Vsim,socr]=diffusion_model_run(params,currData_t,timeData,socData_t,ocvData);
+error_val=mean(abs(Vsim-voltageData_t));
 
 
 
 figure();
 hold on;
-plot(socData,Vsim,'bl');
-plot(socData,voltageData);
+plot(socData_t,Vsim,'bl');
+plot(socData_t,voltageData_t);
 xlabel('SoC');
 ylabel('Voltage');
 
 yyaxis right
-plot(socData,currData,'red');
+plot(socData_t,currData_t,'red');
 ylabel('Current','color','red');
 legend('Model','Exp','Current','location','southeast');
 hold off;
 
-r=linspace(0,1,20);
-hold on;
-for i=1:200:1000
-    plot(r,socr(i,:));
-end
-xlabel('r');
-ylabel('SOC');
-legend('1s', '200s','400s','600s','8000s');
-hold off;
+% r=linspace(0,1,20);
+% hold on;
+% for i=1:200:1000
+%     plot(r,socr(i,:));
+% end
+% xlabel('r');
+% ylabel('SOC');
+% legend('1s', '200s','400s','600s','8000s');
+% hold off;
