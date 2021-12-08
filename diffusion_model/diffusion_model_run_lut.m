@@ -1,22 +1,23 @@
 %% A simple diffusion+ECN model
 
-function [voltOut SoCr]=diffusion_model_run(k,currData,timeData,socData,OcvLuts)
+function [voltOut]=diffusion_model_run_lut(k,currData,timeData,socData,OcvLuts)
 %params
 
 N=1; % controls timestep
 dt=1/N;
+C_lut=[0.1; 0.5; 1; 2; 3; 4; 5].*4.8;
 
 SoC0=socData(1);
 voltOut=ones(length(timeData),1);
 Vrc=0;
 
-R_0=k(1);
-I_0 = k(2);
-alpha=k(3);
-tau0=k(4);
-beta=k(5);
-gama=k(6);
-kd=k(7);
+% R_0=k(1);
+% I_0 = k(2);
+% alpha=k(3);
+% tau0=k(4);
+% beta=k(5);
+% gama=k(6);
+% kd=k(7);
 
 % diffusion settings
 Q=4.7455*3600; %capacity, should be an argument but lazy for the moment
@@ -30,7 +31,7 @@ SoCs = zeros(size(timeData)); % concentration at surface
 SoCavg=SoC0*ones(size(timeData));
 SoCs(1) = SoC0;
 
- h(1)=-1;
+h(1)=-1;
 % h(1)=1;
 k_hyst=10;
 hyst=OcvLuts.Components.hystAmp(:,5); %Hyst data parameters, fifth column for 25 deg.
@@ -47,7 +48,14 @@ curr_Data=currData;
 
 % calc diffusion 
 for timestep = 1:times
-  
+      
+  R_0=interp1(C_lut,k(1,:),curr_Data(timestep));
+  I_0 = interp1(C_lut,k(2,:),curr_Data(timestep));
+  alpha=interp1(C_lut,k(3,:),curr_Data(timestep));
+ tau0=interp1(C_lut,k(4,:),curr_Data(timestep));
+ beta=interp1(C_lut,k(5,:),curr_Data(timestep));
+ gama=interp1(C_lut,k(6,:),curr_Data(timestep));
+ kd=interp1(C_lut,k(7,:),curr_Data(timestep));
 
 IR0=R_0.*curr_Data(timestep);     
 Vbv=0.0256*2*asinh(currData(timestep)/(I_0*((socData(timestep)+alpha))^1*(1-socData(timestep)+alpha)^1)); %BV-like overpotential, larger at high & low soc
@@ -70,8 +78,8 @@ SoCavg(timestep)= socData(timestep);
 OCVcell(timestep)=interp1(OcvLuts.Dims.soc,OcvLuts.Components.ocv(:,5),SoCavg(timestep));% ocv at avearge soc
 OCVcell_surf(timestep)=interp1(OcvLuts.Dims.soc,OcvLuts.Components.ocv(:,5),SoCs(timestep)); %ocv at surface soc
 Vdiff(timestep)=-(kd*(OCVcell(timestep)-OCVcell_surf(timestep)));
-v_Out(timestep)=IR0+Vbv+Vdiff(timestep)+OCVcell(timestep)+U_hyst;
-% v_Out(timestep)=U_hyst;
+% v_Out(timestep)=IR0+Vbv+Vdiff(timestep)+OCVcell(timestep)+U_hyst;
+v_Out(timestep)=IR0+Vbv+OCVcell(timestep)+U_hyst+Vdiff(timestep);
 
 % soc(timestep)=SoCs(timestep);
 end

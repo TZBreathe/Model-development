@@ -4,7 +4,8 @@ function voltOut=diffusion_model(k,currData,timeData,socData,OcvLuts)
 %params
 
 N=1; % controls timestep
-dt=1/N;
+% dt=timeData(2)-timeData(1);
+dt=1;
 
 R_0=k(1);
 I_0 = k(2);
@@ -20,9 +21,9 @@ voltOut=ones(length(timeData),1);
 Vrc=0;
 
 % diffusion settings
-Q=4.7*3600; %capacity, should be an argument but lazy for the moment
+Q=4.7455*3600; %capacity, should be an argument but lazy for the moment
 R = 1; % particle radius [m]
-Nr = 20; % number of "shells" radially
+Nr = 10; % number of "shells" radially
 dR = R/Nr; % width of each "shell"
 Sa = 4*pi*(R*(1:Nr)/Nr).^2; % outer surface area of each shell
 dV = (4/3)*pi*((R*(1:Nr)/Nr).^3-(R*(0:Nr-1)/Nr).^3); % vol. of ea. shell
@@ -32,7 +33,8 @@ SoCavg=SoC0*ones(size(timeData));
 SoCs(1) = SoC0;
 % SoCr=ones(length(timeData),Nr); %internal SoC, maybe useful for gradient]
 
-h(1)=-1;
+% h(1)=-1;
+h(1)=1;
 k_hyst=10;
 hyst=OcvLuts.Components.hystAmp(:,5); %Hyst data parameters, fifth column for 25 deg.
 hyst_0=OcvLuts.Components.hystInst(:,5);
@@ -47,7 +49,7 @@ curr_Data=currData;
 
 % calc diffusion 
 for timestep = 1:times
-    
+
 IR0=R_0.*curr_Data(timestep);     
 Vbv=0.0256*2*asinh(currData(timestep)/(I_0*((socData(timestep)+alpha)^1)*(1-socData(timestep)+alpha)^1)); %BV-like overpotential, larger at high & low soc
 
@@ -73,7 +75,8 @@ OCVcell_surf=interp1(OcvLuts.Dims.soc,OcvLuts.Components.ocv(:,5),SoCs(timestep)
 Vdiff=-kd*(OCVcell-OCVcell_surf);
 
 % v_Out(timestep)=SoCs(timestep);
-v_Out(timestep)=IR0+Vbv+Vdiff+OCVcell+U_hyst;
+ v_Out(timestep)=IR0+Vbv+Vdiff+OCVcell+U_hyst;
+
 
 end
 
