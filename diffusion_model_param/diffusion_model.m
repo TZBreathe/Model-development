@@ -10,8 +10,11 @@ dt=1;
 R_0=k(1);
 I_0 = k(2);
 tau0=k(3);
-beta=k(4);
-kd=k(5);
+kd=k(4);
+Ea1=k(5);
+Ea2=k(6);
+Ea3=k(7);
+
 
 
 SoC0=socData(1);
@@ -48,8 +51,11 @@ curr_Data=currData;
 % calc diffusion 
 for timestep = 1:times
 
-IR0=R_0.*curr_Data(timestep);     
-Vbv=0.0256*2*asinh(currData(timestep)/(I_0*((socData(timestep)+0.01)^1)*(1-socData(timestep)+0.01)^1)); %BV-like overpotential, larger at high & low soc
+    R0=R_0*exp(-Ea1/8.314*(1/tempData(timestep)-1/Tref));
+    I0=I_0*exp(-Ea2/8.314*(1/tempData(timestep)-1/Tref));
+    tau=tau0*exp(-Ea3/8.314*(1/tempData(timestep)-1/Tref));
+IR0=R0.*curr_Data(timestep);     
+Vbv=0.0256*2*asinh(currData(timestep)/(I0*((socData(timestep)+0.01)^1)*(1-socData(timestep)+0.01)^1)); %BV-like overpotential, larger at high & low soc
 
 M_hyst=interp1(OcvLuts.Dims.soc,hyst,socData(timestep));
 M0=interp1(OcvLuts.Dims.soc,hyst_0,socData(timestep));
@@ -58,13 +64,13 @@ U_hyst=M_hyst.*h+sign(curr_Data(timestep)).*M0;
 % 
 
 % tau=tau0/(socData(timestep)+beta); %inverse form
-tau=beta*(1-socData(timestep))+tau0; %linear form
+% tau=beta*(1-socData(timestep))+tau0; %linear form
 
 flux = -1/tau*diff(SoC)/dR; % flux at surfaces between "bins"
 M = flux.*Sa(1:end-1); % total SoC crossing surface between bins
 SoC= SoC+ ([0 M] - [M 0])*dt./dV; % conc. change via diffusion
 SoC(end) = SoC(end) + (curr_Data(timestep)/3/Q)*Sa(end)*dt/dV(end); % at boundary
-SoCs(timestep) = min(0.99,SoC(end)); % surface soc
+SoCs(timestep) = min(1,SoC(end)); % surface soc
 
 % SoCavg(timestep)=(SoC*dV')/(4/3*pi*R^3); % average soc
 SoCavg(timestep)= socData(timestep);

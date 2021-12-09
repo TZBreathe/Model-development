@@ -5,9 +5,9 @@ load brOCV;
 load CC_25;
 
 
-k0=[0.01195; 50; 1000; 1000; 1.2]; %R0, I0,  tauD, beta, kd
-lowBound = [k0(1)/3;  1;    750;     100;     k0(5)/2];
-upBound = [k0(1)*3;   100;  2000;     1500;      k0(5)*1.5];
+k0=[0.01195; 50; 1000; 1.2]; %R0, I0,  tauD, kd
+lowBound = [k0(1)/3;  1;    700;   k0(4)/2];
+upBound = [k0(1)*3;   200;  2800;  k0(4)*1.5];
 
 iniPopSpread=2;
 initGaPopSize = 50;
@@ -46,24 +46,25 @@ LUT25(:,7)=xOptTmp;
 save param_5C.mat xOptTmp
 
 %% 4C
-currData=currentSeries{6}(1:505);
-socData=socRefSeries{6}(1:505);
-voltageData=voltageSeries{6}(1:505);
-tempData=tempSeries{6}(1:505);
+currData=currentSeries{6}(1:450);
+socData=socRefSeries{6}(1:450);
+voltageData=voltageSeries{6}(1:450);
+tempData=tempSeries{6}(1:450);
 timeData=1:length(currData)';
 
 k0=xOptTmp;
-maxOptTime = 60*5;
+genAlgOpts.MaxTime = 60*3;
+maxOptTime = 60*3;
 globObj = @(k)Diffusion_Param_Optim_Function(k,currData,timeData,socData,voltageData,tempData,ocvData);
 [xOptTmp,fOpt(1,1),~,~] = ga(globObj,length(k0),[],[],[],[],lowBound,upBound,[],genAlgOpts);
 
 LUT25(:,6)=xOptTmp;
 save param_4C.mat xOptTmp
 %% 3C
-currData=currentSeries{5}(1:780);
-socData=socRefSeries{5}(1:780);
-voltageData=voltageSeries{5}(1:780);
-tempData=tempSeries{5}(1:780);
+currData=currentSeries{5}(1:700);
+socData=socRefSeries{5}(1:700);
+voltageData=voltageSeries{5}(1:700);
+tempData=tempSeries{5}(1:700);
 timeData=1:length(currData)';
 
 k0=xOptTmp;
@@ -75,10 +76,10 @@ globObj = @(k)Diffusion_Param_Optim_Function(k,currData,timeData,socData,voltage
 LUT25(:,5)=xOptTmp;
 save param_3C.mat xOptTmp
 %% 2C
-currData=currentSeries{4}(1:1290);
-socData=socRefSeries{4}(1:1290);
-voltageData=voltageSeries{4}(1:1290);
-tempData=tempSeries{4}(1:1290);
+currData=currentSeries{4}(1:1200);
+socData=socRefSeries{4}(1:1200);
+voltageData=voltageSeries{4}(1:1200);
+tempData=tempSeries{4}(1:1200);
 timeData=1:length(currData)';
 
 k0=xOptTmp;
@@ -89,14 +90,14 @@ LUT25(:,4)=xOptTmp;
 save param_2C.mat xOptTmp
 %% 1C
 
-currData=currentSeries{3}(1:2840);
-socData=socRefSeries{3}(1:2840);
-voltageData=voltageSeries{3}(1:2840);
-tempData=tempSeries{3}(1:2840);
+currData=currentSeries{3}(500:2840);
+socData=socRefSeries{3}(500:2840);
+voltageData=voltageSeries{3}(500:2840);
+tempData=tempSeries{3}(500:2840);
 timeData=1:length(currData)';
 
-genAlgOpts.MaxTime = 60*10;
-maxOptTime = 60*10;
+genAlgOpts.MaxTime = 60*6;
+maxOptTime = 60*6;
 k0=xOptTmp;
 globObj = @(k)Diffusion_Param_Optim_Function(k,currData,timeData,socData,voltageData,tempData,ocvData);
 [xOptTmp,fOpt(1,1),~,~] = ga(globObj,length(k0),[],[],[],[],lowBound,upBound,[],genAlgOpts);
@@ -118,34 +119,24 @@ globObj = @(k)Diffusion_Param_Optim_Function(k,currData,timeData,socData,voltage
 
 LUT25(:,2)=xOptTmp;
 save param_05C.mat xOptTmp
-%%
+%% 0.1 C
 
 
-voltageData=voltageSeries{1}(24000:end);
-currData=(currentSeries{1}(24000:end));
-socData=socRefSeries{1}(24000:end);
-tempData=tempSeries{1}(2400:end);
+voltageData=voltageSeries{1}(22000:end);
+currData=(currentSeries{1}(22000:end));
+socData=socRefSeries{1}(22000:end);
+tempData=tempSeries{1}(2200:end);
 timeData=1:length(currData)';
 
 
-genAlgOpts.MaxTime = 60*25;
-maxOptTime = 60*25;
+genAlgOpts.MaxTime = 60*15;
+maxOptTime = 60*15;
 k0=xOptTmp;
 globObj = @(k)Diffusion_Param_Optim_Function(k,currData,timeData,socData,voltageData,tempData,ocvData);
 [xOptTmp,fOpt(1,1),~,~] = ga(globObj,length(k0),[],[],[],[],lowBound,upBound,[],genAlgOpts);
 
 LUT25(:,1)=xOptTmp;
 save param_01C.mat xOptTmp
-
-
-%% Fitting model
-
-% Initial values and bounds
-
-
-
-				
-% Perform the optimisation with the bounds
 
 
 %% Run and plot
@@ -186,6 +177,7 @@ LUT25(:,6)=xOptTmp;
 load param_5C.mat
 LUT25(:,7)=xOptTmp;
 
+save LUT25.mat LUT25;
 
 
 
@@ -194,11 +186,11 @@ LUT25(:,7)=xOptTmp;
 load LUT25.mat
 load lincc_25.mat;
 params=LUT25;
-currData_t=lincc_25{3}(14:1400,1);
-socData_t=lincc_25{3}(14:1400,3);
-voltageData_t=lincc_25{3}(14:1400,2);
+currData_t=lincc_25{3}(3:600,1);
+socData_t=lincc_25{3}(3:600,3);
+voltageData_t=lincc_25{3}(3:600,2);
 tempData_t=35*ones(1391,1);
-timeData=1:length(currData_t)';
+timeData=3:length(currData_t)+2;
 % 
 
  Vsim=diffusion_model_run_lut(params,currData_t,timeData,socData_t,ocvData);

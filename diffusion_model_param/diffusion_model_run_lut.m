@@ -51,9 +51,8 @@ for timestep = 1:times
       
   R_0=interp1(C_lut,k(1,:),curr_Data(timestep));
   I_0 = interp1(C_lut,k(2,:),curr_Data(timestep));
-  tau0=interp1(C_lut,k(3,:),curr_Data(timestep));
- beta=interp1(C_lut,k(4,:),curr_Data(timestep));
- kd=interp1(C_lut,k(5,:),curr_Data(timestep));
+  tau=interp1(C_lut,k(3,:),curr_Data(timestep));
+  kd=interp1(C_lut,k(4,:),curr_Data(timestep));
 
 IR0=R_0.*curr_Data(timestep);     
 Vbv=0.0256*2*asinh(currData(timestep)/(I_0*((socData(timestep)+0.01))^1*(1-socData(timestep)+0.01)^1)); %BV-like overpotential, larger at high & low soc
@@ -64,7 +63,7 @@ h=exp(-dt*abs(curr_Data(timestep))*k_hyst/(Q))*h+sign(curr_Data(timestep))*(1-ex
 U_hyst=M_hyst.*h+sign(curr_Data(timestep)).*M0;
 
 % tau=tau0/(socData(timestep)+beta); 
-tau=beta*(1-socData(timestep))+tau0; %quadratic form
+% tau=beta*(1-socData(timestep))+tau0; %quadratic form
 flux = -1/tau*diff(SoC)/dR; % flux at surfaces between "bins"
 M = flux.*Sa(1:end-1); % total SoC crossing surface between bins
 SoC= SoC+ ([0 M] - [M 0])*dt./dV; % conc. change via diffusion

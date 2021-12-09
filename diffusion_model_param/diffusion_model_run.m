@@ -12,9 +12,8 @@ Vrc=0;
 
 R_0=k(1);
 I_0 = k(2);
-tau0=k(3);
-beta=k(4);
-kd=k(5);
+tau=k(3);
+kd=k(4);
 
 % diffusion settings
 Q=4.7455*3600; %capacity, should be an argument but lazy for the moment
@@ -56,13 +55,13 @@ h=exp(-dt*abs(curr_Data(timestep))*k_hyst/(Q))*h+sign(curr_Data(timestep))*(1-ex
 U_hyst=M_hyst.*h+sign(curr_Data(timestep)).*M0;
 
 % tau=tau0/(socData(timestep)+beta); 
-tau=beta*(1-socData(timestep))+tau0; %quadratic form
+% tau=beta*(1-socData(timestep))+tau0; %quadratic form
 flux = -1/tau*diff(SoC)/dR; % flux at surfaces between "bins"
 M = flux.*Sa(1:end-1); % total SoC crossing surface between bins
 SoC= SoC+ ([0 M] - [M 0])*dt./dV; % conc. change via diffusion
 SoCr(timestep,:)=SoC;
 SoC(end) = SoC(end) + (curr_Data(timestep)/3/Q)*Sa(end)*dt/dV(end); % at boundary
-SoCs(timestep) = min(0.99,SoC(end)); % surface soc
+SoCs(timestep) = min(1,SoC(end)); % surface soc
 % SoCavg(timestep)=(SoC*dV')/(4/3*pi*R^3); % average soc
 SoCavg(timestep)= socData(timestep);
 OCVcell(timestep)=interpn(OcvLuts.Dims.soc,OcvLuts.Dims.temp,OcvLuts.Components.ocv,SoCavg(timestep),tempData(timestep),'makima');% ocv at avearge soc
