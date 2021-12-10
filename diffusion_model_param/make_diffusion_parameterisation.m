@@ -5,9 +5,9 @@ load brOCV;
 load CC_25;
 
 
-k0=[0.01195; 50; 1000; 1.2]; %R0, I0,  tauD, kd
-lowBound = [k0(1)/3;  1;    700;   k0(4)/2];
-upBound = [k0(1)*3;   200;  2800;  k0(4)*1.5];
+k0=[0.01195; 50; 1000; 1.2; 9000; 9000; 9000]; %R0, I0,  tauD, kd, Ea1, Ea2, Ea3
+lowBound = [k0(1)/3;  100;    700;   k0(4)/2;  5000; 5000; 5000];
+upBound = [k0(1)*3;   350;   2900;   k0(4)*1.3; 13000; 13000; 13000];
 
 iniPopSpread=2;
 initGaPopSize = 50;
@@ -29,6 +29,21 @@ genAlgOpts = optimoptions('ga','Display','iter','InitialPopulationMatrix',...
 				'HybridFcn',{@fmincon,hybridopts});
  ocvData=BrOcv;
 
+%% 4C
+currData=currentSeries{6}(1:450);
+socData=socRefSeries{6}(1:450);
+voltageData=voltageSeries{6}(1:450);
+tempData=tempSeries{6}(1:450);
+timeData=1:length(currData)';
+
+% k0=xOptTmp;
+genAlgOpts.MaxTime = 60*5;
+maxOptTime = 60*5;
+globObj = @(k)Diffusion_Param_Optim_Function(k,currData,timeData,socData,voltageData,tempData,ocvData);
+[xOptTmp,fOpt(1,1),~,~] = ga(globObj,length(k0),[],[],[],[],lowBound,upBound,[],genAlgOpts);
+
+LUT25(:,6)=xOptTmp;
+save param_4C.mat xOptTmp
 %% 5C
 
 currData=currentSeries{7};
@@ -37,29 +52,18 @@ voltageData=voltageSeries{7};
 tempData=tempSeries{7};
 timeData=1:length(currData)';
 
-genAlgOpts.MaxTime = 60*3;
-maxOptTime = 60*3;
+k0=xOptTmp;
+lowBound = [k0(1)/3;  k0(2)*0.7;    k0(3)*0.7;   k0(4)*0.7;  k0(5); k0(6); k0(7)];
+upBound = [k0(1)*3;   k0(2)*1.5;    k0(3)*1.5;   k0(4)*1.3;  k0(5); k0(6); k0(7)];
+genAlgOpts.MaxTime = 60*2;
+maxOptTime = 60*2;
 globObj = @(k)Diffusion_Param_Optim_Function(k,currData,timeData,socData,voltageData,tempData,ocvData);
 [xOptTmp,fOpt(1,1),~,~] = ga(globObj,length(k0),[],[],[],[],lowBound,upBound,[],genAlgOpts);
 
 LUT25(:,7)=xOptTmp;
 save param_5C.mat xOptTmp
 
-%% 4C
-currData=currentSeries{6}(1:450);
-socData=socRefSeries{6}(1:450);
-voltageData=voltageSeries{6}(1:450);
-tempData=tempSeries{6}(1:450);
-timeData=1:length(currData)';
 
-k0=xOptTmp;
-genAlgOpts.MaxTime = 60*3;
-maxOptTime = 60*3;
-globObj = @(k)Diffusion_Param_Optim_Function(k,currData,timeData,socData,voltageData,tempData,ocvData);
-[xOptTmp,fOpt(1,1),~,~] = ga(globObj,length(k0),[],[],[],[],lowBound,upBound,[],genAlgOpts);
-
-LUT25(:,6)=xOptTmp;
-save param_4C.mat xOptTmp
 %% 3C
 currData=currentSeries{5}(1:700);
 socData=socRefSeries{5}(1:700);
@@ -68,8 +72,10 @@ tempData=tempSeries{5}(1:700);
 timeData=1:length(currData)';
 
 k0=xOptTmp;
-genAlgOpts.MaxTime = 60*5;
-maxOptTime = 60*5;
+lowBound = [k0(1)/2;  k0(2)*0.5;    k0(3)*0.8;   k0(4)*0.8;  k0(5); k0(6); k0(7)];
+upBound = [k0(1)*2;   k0(2)*1.2;    k0(3)*1.2;   k0(4)*1.2;  k0(5); k0(6); k0(7)];
+genAlgOpts.MaxTime = 60*3;
+maxOptTime = 60*3;
 globObj = @(k)Diffusion_Param_Optim_Function(k,currData,timeData,socData,voltageData,tempData,ocvData);
 [xOptTmp,fOpt(1,1),~,~] = ga(globObj,length(k0),[],[],[],[],lowBound,upBound,[],genAlgOpts);
 
@@ -83,6 +89,8 @@ tempData=tempSeries{4}(1:1200);
 timeData=1:length(currData)';
 
 k0=xOptTmp;
+lowBound = [k0(1)/2;  k0(2)*0.5;    k0(3)*0.8;   k0(4)*0.8;  k0(5); k0(6); k0(7)];
+upBound = [k0(1)*2;   k0(2)*1.1;    k0(3)*1.2;   k0(4)*1.2;  k0(5); k0(6); k0(7)];
 globObj = @(k)Diffusion_Param_Optim_Function(k,currData,timeData,socData,voltageData,tempData,ocvData);
 [xOptTmp,fOpt(1,1),~,~] = ga(globObj,length(k0),[],[],[],[],lowBound,upBound,[],genAlgOpts);
 
@@ -96,9 +104,11 @@ voltageData=voltageSeries{3}(500:2840);
 tempData=tempSeries{3}(500:2840);
 timeData=1:length(currData)';
 
-genAlgOpts.MaxTime = 60*6;
-maxOptTime = 60*6;
+genAlgOpts.MaxTime = 60*4;
+maxOptTime = 60*4;
 k0=xOptTmp;
+lowBound = [k0(1)/2;  k0(2)*0.5;    k0(3)*0.8;   k0(4)*0.8;  k0(5); k0(6); k0(7)];
+upBound = [k0(1)*2;   k0(2)*1.1;    k0(3)*1.2;   k0(4)*1.2;  k0(5); k0(6); k0(7)];
 globObj = @(k)Diffusion_Param_Optim_Function(k,currData,timeData,socData,voltageData,tempData,ocvData);
 [xOptTmp,fOpt(1,1),~,~] = ga(globObj,length(k0),[],[],[],[],lowBound,upBound,[],genAlgOpts);
 
@@ -112,8 +122,11 @@ voltageData=voltageSeries{2}(3000:6500);
 tempData=tempSeries{2}(3000:6500);
 timeData=1:length(currData)';
 
-
+genAlgOpts.MaxTime = 60*10;
+maxOptTime = 60*10;
 k0=xOptTmp;
+lowBound = [k0(1)/2;  k0(2)*0.5;    k0(3)*0.5;   k0(4)*0.5;  k0(5); k0(6); k0(7)];
+upBound = [k0(1)*2;   k0(2)*1.1;    k0(3)*1.2;   k0(4)*1.1;  k0(5); k0(6); k0(7)];
 globObj = @(k)Diffusion_Param_Optim_Function(k,currData,timeData,socData,voltageData,tempData,ocvData);
 [xOptTmp,fOpt(1,1),~,~] = ga(globObj,length(k0),[],[],[],[],lowBound,upBound,[],genAlgOpts);
 
@@ -130,8 +143,9 @@ timeData=1:length(currData)';
 
 
 genAlgOpts.MaxTime = 60*15;
-maxOptTime = 60*15;
-k0=xOptTmp;
+maxOptTime = 60*15;k0=xOptTmp;
+lowBound = [k0(1)/2;  k0(2)*0.5;    k0(3)*0.5;   k0(4)*0.5;  k0(5); k0(6); k0(7)];
+upBound = [k0(1)*2;   k0(2)*1.1;    k0(3)*1.2;   k0(4)*1.1;  k0(5); k0(6); k0(7)];
 globObj = @(k)Diffusion_Param_Optim_Function(k,currData,timeData,socData,voltageData,tempData,ocvData);
 [xOptTmp,fOpt(1,1),~,~] = ga(globObj,length(k0),[],[],[],[],lowBound,upBound,[],genAlgOpts);
 

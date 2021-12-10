@@ -6,10 +6,11 @@ function voltOut=diffusion_model(k,currData,timeData,socData,tempData,OcvLuts)
 N=1; % controls timestep
 % dt=timeData(2)-timeData(1);
 dt=1;
+Tref=25+273;
 
 R_0=k(1);
 I_0 = k(2);
-tau0=k(3);
+tau_0=k(3);
 kd=k(4);
 Ea1=k(5);
 Ea2=k(6);
@@ -51,9 +52,10 @@ curr_Data=currData;
 % calc diffusion 
 for timestep = 1:times
 
-    R0=R_0*exp(-Ea1/8.314*(1/tempData(timestep)-1/Tref));
-    I0=I_0*exp(-Ea2/8.314*(1/tempData(timestep)-1/Tref));
-    tau=tau0*exp(-Ea3/8.314*(1/tempData(timestep)-1/Tref));
+    R0=R_0*exp(-Ea1/8.314*(-1/(273+tempData(timestep))+1/Tref));
+    I0=I_0*exp(-Ea2/8.314*(-1/(273+tempData(timestep))+1/Tref));
+    tau=tau_0*exp(-Ea3/8.314*(-1/(273+tempData(timestep))+1/Tref));
+    
 IR0=R0.*curr_Data(timestep);     
 Vbv=0.0256*2*asinh(currData(timestep)/(I0*((socData(timestep)+0.01)^1)*(1-socData(timestep)+0.01)^1)); %BV-like overpotential, larger at high & low soc
 

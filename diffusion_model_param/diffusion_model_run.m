@@ -5,6 +5,7 @@ function [voltOut Vdiff Vbv]=diffusion_model_run(k,currData,timeData,socData,tem
 
 N=1; % controls timestep
 dt=1/N;
+Tref=273+25;
 
 SoC0=socData(1);
 voltOut=ones(length(timeData),1);
@@ -12,8 +13,12 @@ Vrc=0;
 
 R_0=k(1);
 I_0 = k(2);
-tau=k(3);
+tau_0=k(3);
 kd=k(4);
+Ea1=k(5);
+Ea2=k(6);
+Ea3=k(7);
+
 
 % diffusion settings
 Q=4.7455*3600; %capacity, should be an argument but lazy for the moment
@@ -45,9 +50,12 @@ curr_Data=currData;
 % calc diffusion 
 for timestep = 1:times
   
-
-IR0=R_0.*curr_Data(timestep);     
-Vbv(timestep)=0.0256*2*asinh(currData(timestep)/(I_0*((socData(timestep)+0.01))^1*(1-socData(timestep)+0.01)^1)); %BV-like overpotential, larger at high & low soc
+    R0=R_0*exp(-Ea1/8.314*(-1/(273+tempData(timestep))+1/Tref));
+    I0=I_0*exp(-Ea2/8.314*(-1/(273+tempData(timestep))+1/Tref));
+    tau=tau_0*exp(-Ea3/8.314*(-1/(273+tempData(timestep))+1/Tref));
+    
+IR0=R0.*curr_Data(timestep);     
+Vbv(timestep)=0.0256*2*asinh(currData(timestep)/(I0*((socData(timestep)+0.01))^1*(1-socData(timestep)+0.01)^1)); %BV-like overpotential, larger at high & low soc
 
 M_hyst=interp1(OcvLuts.Dims.soc,hyst,socData(timestep));
 M0=interp1(OcvLuts.Dims.soc,hyst_0,socData(timestep));
