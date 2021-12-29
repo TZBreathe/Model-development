@@ -26,3 +26,12 @@ for i=1:7
 end
 
 
+%% temp
+hold on
+plot(socRefSeries{5},voltageSeries{5});
+plot(BrOcv.Dims.soc,BrOcv.Components.ocv (:,5));
+hold off
+figure
+
+OCVS=interp1(BrOcv.Dims.soc,BrOcv.Components.ocv (:,5),socRefSeries{5});
+plot(socRefSeries{5},voltageSeries{5}-OCVS);

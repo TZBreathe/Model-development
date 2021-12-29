@@ -1,11 +1,12 @@
 %% A simple diffusion+ECN model
 
-function [voltOut]=diffusion_model_run_lut(k,currData,timeData,socData,OcvLuts)
+function [voltOut]=diffusion_model_run_lut(k,currData,timeData,socData,tempData,OcvLuts)
 %params
 
 N=1; % controls timestep
 dt=1/N;
 C_lut=[0.1; 0.5; 1; 2; 3; 4; 5].*4.8;
+Tref=273+25;
 
 SoC0=socData(1);
 voltOut=ones(length(timeData),1);
@@ -51,11 +52,18 @@ for timestep = 1:times
       
   R_0=interp1(C_lut,k(1,:),curr_Data(timestep));
   I_0 = interp1(C_lut,k(2,:),curr_Data(timestep));
-  tau=interp1(C_lut,k(3,:),curr_Data(timestep));
+  tau_0=interp1(C_lut,k(3,:),curr_Data(timestep));
   kd=interp1(C_lut,k(4,:),curr_Data(timestep));
+  Ea1=k(5,1);
+  Ea2=k(6,1);
+  Ea3=k(7,1);
+  
+  R0=R_0*exp(-Ea1/8.314*(-1/(273+tempData(timestep))+1/Tref));
+  I0=I_0*exp(-Ea2/8.314*(-1/(273+tempData(timestep))+1/Tref));
+  tau=tau_0*exp(-Ea3/8.314*(-1/(273+tempData(timestep))+1/Tref));
 
-IR0=R_0.*curr_Data(timestep);     
-Vbv=0.0256*2*asinh(currData(timestep)/(I_0*((socData(timestep)+0.01))^1*(1-socData(timestep)+0.01)^1)); %BV-like overpotential, larger at high & low soc
+IR0=R0.*curr_Data(timestep);     
+Vbv=0.0256*2*asinh(currData(timestep)/(I0*((socData(timestep)+0.01))^1*(1-socData(timestep)+0.01)^1)); %BV-like overpotential, larger at high & low soc
 
 M_hyst=interp1(OcvLuts.Dims.soc,hyst,socData(timestep));
 M0=interp1(OcvLuts.Dims.soc,hyst_0,socData(timestep));
